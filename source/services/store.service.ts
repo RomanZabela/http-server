@@ -5,8 +5,8 @@ import { Stores } from "../entities";
 import { ErrorHelper} from "../helpers/error.helper";
 
 interface localStores {
-    id: number;
-    Name: string;
+    Store_ID: number;
+    Store_Name: string;
 }
 
 interface IStoreService {
@@ -17,7 +17,7 @@ interface IStoreService {
 export class StoreService implements IStoreService { 
     public getStores(): Promise<Stores[]> {
         return new Promise<Stores[]>((resolve, reject) => {
-            const result: Stores[] = [];
+            let result: Stores[] = [];
 
             const sql: SqlClient = require("msnodesqlv8");
 
@@ -26,7 +26,7 @@ export class StoreService implements IStoreService {
     
             sql.open(connectionString,  (connectionError: Error, connection: Connection) => {
                 if (connectionError) {
-                    reject(ErrorHelper.parseError(ErrorCodes.ConnectionError, General.DBConnectionError));
+                    reject(ErrorHelper.parseError(ErrorCodes.queryError, General.SQLQueryError ));
                 } else {                
                     connection.query(query, (queryError: Error | undefined, queryResult: localStores[] | undefined) => {
                         if (queryError) {
@@ -53,6 +53,7 @@ export class StoreService implements IStoreService {
         let result: Stores;
         return new Promise<Stores>((resolve, reject) => {
             const sql: SqlClient = require("msnodesqlv8");
+
             const connectionString: string = DB_CONNECTION_STRING;
             const query: string = StoreQueries.getStoreByID;
 
@@ -79,8 +80,8 @@ export class StoreService implements IStoreService {
 
     private parseLocalStore(local: localStores): Stores {
         return {
-            id: local.id,
-            storename: local.Name
+            id: local.Store_ID,
+            storename: local.Store_Name
         }
     }
 }
