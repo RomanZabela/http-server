@@ -1,6 +1,8 @@
 export interface Stores {
     id: number;
-    storename: string;
+    storeName: string;
+    storeAdress: string;
+    storeCapacity: number;
 }
 
 export interface systemError {

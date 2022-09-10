@@ -9,8 +9,9 @@ export class General {
 }
 
 export const DB_CONNECTION_STRING: string = "server=.;Database=Haifa_store;Trusted_Connection=Yes;Driver={SQL Server Native Client 11.0}";
+export const DB_CLIENT: string = "msnodesqlv8"
 
 export class StoreQueries {
-    public static getStores: string = "SELECT Store_Name FROM dbo.Stores";
+    public static getStores: string = "SELECT * FROM dbo.Stores";
     public static getStoreByID: string = "SELECT Store_Name FROM dbo.Stores WHERE Store_ID = ";
 }
