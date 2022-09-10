@@ -3,6 +3,7 @@ import http from 'http';
 import express, { Express } from 'express';
 import morgan from 'morgan';
 import routes from './routes/posts';
+import storeroutes from './routes/store.route';
 
 const router: Express = express();
 
@@ -28,7 +29,8 @@ router.use((req, res, next) => {
 });
 
 /** Routes */
-router.use('/', routes);
+router.use('/demo', routes);
+router.use('/',storeroutes.route);
 
 /** Error handling */
 router.use((req, res, next) => {
