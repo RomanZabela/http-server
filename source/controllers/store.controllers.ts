@@ -50,8 +50,8 @@ const updateStoreByID = async (req: Request, res: Response, next: NextFunction) 
             storeService.updateStore({
                 id: numericParamOrError,
                 storeCapacity: body.storeCapacity,
-                storeName: body.storeName,
-                storeAdress: body.storeAdress
+                storeName: "",
+                storeAdress: ""
             })
             .then(() => {
                 return res.sendStatus(200);

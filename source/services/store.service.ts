@@ -1,4 +1,3 @@
-import { reject } from "underscore";
 import { StoreQueries, } from "../constants";
 import { systemError, Stores } from "../entities";
 import { SQLHelper } from "../helpers/sql.helper";

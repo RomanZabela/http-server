@@ -66,7 +66,7 @@ export class SQLHelper {
         });
     }
 
-    public static executeQueryUpdate(query: string, ...params: (string | number)[]): Promise<void> {
+    public static executeQueryUpdate(query: string, ...params: (number | number)[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             SQLHelper.openConnection()
             .then((connection: Connection) => {
