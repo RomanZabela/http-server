@@ -16,8 +16,8 @@ export class General {
 
 export class StoreQueries {
     public static getStores: string = "SELECT * FROM dbo.Stores";
-    public static getStoreByID: string = "SELECT Store_Name FROM dbo.Stores WHERE Store_ID = ";
-    public static updateStoreCapacity: string = "UPDATE Stores SET Store_Capacity = ? WHERE Store_ID = ?"
+    public static getStoreByID: string = "SELECT Store_Name FROM dbo.Stores WHERE Store_ID = ?";
+    public static updateStoreCapacity: string = "UPDATE Stores SET Store_Capacity = ?, Store_Name = ? WHERE Store_ID = ?"
 }
 
 export const DB_CONNECTION_STRING: string = "server=.;Database=Haifa_store;Trusted_Connection=Yes;Driver={SQL Server Native Client 11.0}";

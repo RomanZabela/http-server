@@ -54,7 +54,7 @@ export class StoreService implements IStoreService {
 
     public updateStore(storeType: Stores): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.id)
+            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.id)
             .then(() => {
                 resolve();
             })
