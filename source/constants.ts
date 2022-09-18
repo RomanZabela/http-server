@@ -23,7 +23,8 @@ export class StoreQueries {
     public static getStoreByID: string = "SELECT Store_Name FROM dbo.Stores WHERE Store_ID = ?";
     public static updateStoreCapacity: string = "UPDATE Stores SET Store_Capacity = ?, Store_Name = ? WHERE Store_ID = ?";
 
-    public static addNewStore: string = "INSERT INTO Stores (Store_Name, Store_Address, Store_Capacity) Values (?, ?, ?)";
+    public static selectIdentity: string = "SELECT SCOPE_IDENTITY() AS id;";
+    public static addNewStore: string = "INSERT INTO Stores (Store_Name, Store_Address, Store_Capacity, Store_Field_Type, Store_Field_Update) Values (?, ?, ?, ?, ?)";
     public static deleteStore: string = "UPDATE Stores SET Store_Field_Update = ?, Store_Field_Type = ? WHERE Store_ID = ? AND Store_Field_type";
 }
 

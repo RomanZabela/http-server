@@ -4,9 +4,9 @@ import { systemError } from "../entities";
 import { ErrorHelper } from "./error.helper";
 
 export class RequestHelper {
-    static handlerError(res: Response<any, Record<string, any>>, error: systemError): any {
-        throw new Error('Method not implemented.');
-    }
+    // static handlerError(res: Response<any, Record<string, any>>, error: systemError): any {
+    //     throw new Error('Method not implemented.');
+    // }
 
     public static ParseNumericInput(input: string): number | systemError {
         let result: number = -1;

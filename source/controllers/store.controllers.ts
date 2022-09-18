@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
+import { NON_EXISTING_ID } from '../constants';
 import { systemError, Stores } from '../entities';
+import { Status } from '../enum';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
 import { StoreService } from '../services/store.service';
@@ -51,7 +53,9 @@ const updateStoreByID = async (req: Request, res: Response, next: NextFunction) 
                 id: numericParamOrError,
                 storeCapacity: body.storeCapacity,
                 storeName: body.storeName,
-                storeAdress: ""
+                storeAdress: "",
+                storeActive: 1,
+                storeUpdateDate: new Date(),
             })
             .then(() => {
                 return res.sendStatus(200);
@@ -67,4 +71,23 @@ const updateStoreByID = async (req: Request, res: Response, next: NextFunction) 
     }
 };
 
-export default { getStores, getStoreByID, updateStoreByID };
+const addStore = async (req: Request, res: Response, next: NextFunction) => {
+    const body: Stores = req.body;
+
+    storeService.addStore({
+        id: NON_EXISTING_ID,
+        storeCapacity: body.storeCapacity,
+        storeName: body.storeName,
+        storeAdress: body.storeAdress,
+        storeActive: Status.Active,
+        storeUpdateDate: new Date(),
+    })
+    .then((result: Stores) => {
+        return res.status(200).json(result);
+    })
+    .catch((error: systemError) => {
+        return ResponseHelper.handleError(res, error);
+    });
+};
+
+export default { getStores, getStoreByID, updateStoreByID, addStore };

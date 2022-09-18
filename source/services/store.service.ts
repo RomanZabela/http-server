@@ -1,5 +1,7 @@
+import { result } from "underscore";
 import { StoreQueries, } from "../constants";
 import { systemError, Stores } from "../entities";
+import { DateHelper } from "../helpers/date.helper";
 import { SQLHelper } from "../helpers/sql.helper";
 
 interface localStores {
@@ -7,12 +9,15 @@ interface localStores {
     Store_Name: string;
     Store_Address: string;
     Store_Capacity: number;
+    Store_Field_Type: number;
+    Store_Field_Update: Date;
 }
 
 interface IStoreService {
     getStores(): Promise<Stores[]>;
     getStore(id: number): Promise<Stores>;
     updateStore(Stores: Stores): Promise<void>;
+    addStore(Stores: Stores): Promise<Stores>;
 }
 
 export class StoreService implements IStoreService { 
@@ -64,12 +69,28 @@ export class StoreService implements IStoreService {
         });
     }
 
+    public addStore(Stores: Stores): Promise<Stores> {
+        return new Promise<Stores>((resolve, reject) => {
+            const updateDate: Date = new Date();
+            console.log(updateDate.toString());
+            SQLHelper.createNew<Stores>(StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate)
+                .then((result: Stores) => {
+                    resolve(result);
+                }) 
+                .catch((error: systemError) => {
+                    reject(error);
+                });
+        });
+    }
+
     private parseLocalStore(local: localStores): Stores {
         return {
             id: local.Store_ID,
             storeName: local.Store_Name,
             storeAdress: local.Store_Address,
-            storeCapacity: local.Store_Capacity
+            storeCapacity: local.Store_Capacity,
+            storeActive: local.Store_Field_Type,
+            storeUpdateDate: local.Store_Field_Update,
         }
     }
 }

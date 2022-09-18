@@ -1,5 +1,5 @@
-import { Connection, SqlClient, Error } from "msnodesqlv8";
-import { DB_CLIENT, DB_CONNECTION_STRING, ErrorCodes, GeneralMessage } from "../constants";
+import { Connection, SqlClient, Error, QueryEvent } from "msnodesqlv8";
+import { DB_CLIENT, DB_CONNECTION_STRING, ErrorCodes, GeneralMessage, StoreQueries } from "../constants";
 import { systemError } from "../entities";
 import { ErrorHelper } from "./error.helper";
 
@@ -75,6 +75,42 @@ export class SQLHelper {
                         reject(ErrorHelper.createError(ErrorCodes.QueryError, GeneralMessage.SQLQueryError));
                     } else {
                         resolve();
+                    }
+                });
+            })
+            .catch((error: systemError) => {
+                reject(error);
+            })
+        });
+    }
+
+    public static createNew<T>(query: string, original: T, ...params: (string | number | Date)[]): Promise<T> {
+        return new Promise<T>((resolve, reject) => {
+            SQLHelper.openConnection()
+
+            .then((connection: Connection) => {
+                const queries: string[] = [query, StoreQueries.selectIdentity];
+                const executeQuery: string = queries.join(";");
+                let executionCounter: number = 0;
+                connection.query(executeQuery, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
+                    if (queryError) {
+                        reject(ErrorHelper.createError(ErrorCodes.QueryError, GeneralMessage.SQLQueryError));
+                    } else {
+                        executionCounter++;
+                        const badQueryError: systemError = ErrorHelper.createError(ErrorCodes.QueryError, GeneralMessage.SQLQueryError);
+
+                        if (executionCounter === queries.length) {
+                            if (queryResult !== undefined) {
+                                if (queryResult.length === 1) {
+                                    (original as any).id = (queryResult[0] as any).id;
+                                    resolve(original);
+                                } else {
+                                    reject(badQueryError);
+                                }
+                            } else {
+                                reject(badQueryError);
+                            }
+                        }
                     }
                 });
             })

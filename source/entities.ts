@@ -3,6 +3,8 @@ export interface Stores {
     storeName: string;
     storeAdress: string;
     storeCapacity: number;
+    storeActive: number;
+    storeUpdateDate: Date;
 }
 
 export interface systemError {
