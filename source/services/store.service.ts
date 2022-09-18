@@ -1,8 +1,9 @@
-import { result } from "underscore";
-import { StoreQueries, } from "../constants";
-import { systemError, Stores } from "../entities";
-import { DateHelper } from "../helpers/date.helper";
+import * as _ from "underscore";
+import { StoreQueries, TEMP_USER_ID} from "../constants";
+import { systemError, Stores, entityWithID } from "../entities";
+import { Status } from "../enum";
 import { SQLHelper } from "../helpers/sql.helper";
+import { ErrorService } from "./error.service";
 
 interface localStores {
     Store_ID: number;
@@ -24,11 +25,15 @@ export class StoreService implements IStoreService {
    
     // get all stores name
 
+    constructor(
+        private errorService: ErrorService
+    ) { }
+
     public getStores(): Promise<Stores[]> {
         return new Promise<Stores[]>((resolve, reject) => {
             const result: Stores[] = [];
             
-            SQLHelper.executeQueryArray<localStores>(StoreQueries.getStores)
+            SQLHelper.executeQueryArray<localStores>(this.errorService, StoreQueries.getStores, Status.Active)
             .then ((queryResult: localStores[]) => {
                 queryResult.forEach((StoresType: localStores) => {
                     result.push(this.parseLocalStore(StoresType));
@@ -45,7 +50,7 @@ export class StoreService implements IStoreService {
 
     public getStore(id: number): Promise<Stores> {
         return new Promise<Stores>((resolve, reject) => {
-            SQLHelper.executeQuerySingle<localStores>(StoreQueries.getStoreByID, id)
+            SQLHelper.executeQuerySingle<localStores>(this.errorService, StoreQueries.getStoreByID, id, Status.Active)
             .then((queryResult: localStores) => {
                 resolve(this.parseLocalStore(queryResult));
             })
@@ -59,7 +64,7 @@ export class StoreService implements IStoreService {
 
     public updateStore(storeType: Stores): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.id)
+            SQLHelper.executeQueryUpdate(this.errorService, StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.id, Status.Active)
             .then(() => {
                 resolve();
             })
@@ -72,10 +77,10 @@ export class StoreService implements IStoreService {
     public addStore(Stores: Stores): Promise<Stores> {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
-            console.log(updateDate.toString());
-            SQLHelper.createNew<Stores>(StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate)
-                .then((result: Stores) => {
-                    resolve(result);
+
+            SQLHelper.createNew(this.errorService, StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate, Status.Active)
+                .then((result: entityWithID) => {
+                    resolve(result as Stores);
                 }) 
                 .catch((error: systemError) => {
                     reject(error);

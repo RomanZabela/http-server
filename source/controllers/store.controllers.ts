@@ -4,10 +4,12 @@ import { systemError, Stores } from '../entities';
 import { Status } from '../enum';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
+import { ErrorService } from '../services/error.service';
 import { StoreService } from '../services/store.service';
 
 
-const storeService: StoreService = new StoreService();
+const errorService: ErrorService = new ErrorService();
+const storeService: StoreService = new StoreService(errorService);
 
 const getStores = async (req: Request, res: Response, next: NextFunction) => {
     storeService.getStores()
@@ -22,7 +24,7 @@ const getStores = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getStoreByID = async (req: Request, res: Response, next: NextFunction) => {
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id);
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id);
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {
             storeService.getStore(numericParamOrError)
@@ -43,7 +45,7 @@ const getStoreByID = async (req: Request, res: Response, next: NextFunction) => 
 
 const updateStoreByID = async (req: Request, res: Response, next: NextFunction) => {
 
-    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id)
+    const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(errorService, req.params.id)
 
     if (typeof numericParamOrError === "number") {
         if (numericParamOrError > 0) {

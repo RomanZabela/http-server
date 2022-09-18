@@ -1,5 +1,6 @@
-export interface Stores {
-    id: number;
+import { AppError } from "./enum";
+
+export interface Stores extends entityWithID{
     storeName: string;
     storeAdress: string;
     storeCapacity: number;
@@ -8,6 +9,7 @@ export interface Stores {
 }
 
 export interface systemError {
+    key: AppError;
     code: number;
     message: string;
 }
@@ -16,4 +18,8 @@ export interface sqlParametr {
     name: string;
     type: any;
     value: string | number;
+}
+
+export interface entityWithID {
+    id: number;
 }

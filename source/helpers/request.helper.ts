@@ -1,24 +1,25 @@
 import { Response } from "express";
-import { ErrorCodes, GeneralMessage } from "../constants";
+import { ErrorCodes, GeneralMessage, NON_EXISTING_ID } from "../constants";
 import { systemError } from "../entities";
-import { ErrorHelper } from "./error.helper";
+import { AppError } from "../enum";
+import { ErrorService } from "../services/error.service";
 
 export class RequestHelper {
     // static handlerError(res: Response<any, Record<string, any>>, error: systemError): any {
     //     throw new Error('Method not implemented.');
     // }
 
-    public static ParseNumericInput(input: string): number | systemError {
-        let result: number = -1;
+    public static ParseNumericInput(errorService: ErrorService, input: string): number | systemError {
+        let result: number = NON_EXISTING_ID;
 
         if (isNaN(Number(input))) {
-            return ErrorHelper.createError(ErrorCodes.NonNumericInput, GeneralMessage.NonNumericInput);
+            return errorService.getError(AppError.NonNumericInput);
         }
 
         if (input !== null && input !== undefined) {
             result = parseInt(input);
         } else {
-            return ErrorHelper.createError(ErrorCodes.InputParameterSupplied, GeneralMessage.InputParameterNotSupplied);
+            return errorService.getError(AppError.InputParameterSupplied);
         }
 
         return result;
