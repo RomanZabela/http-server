@@ -23,3 +23,7 @@ export interface sqlParametr {
 export interface entityWithID {
     id: number;
 }
+
+export interface jwsUserData {
+    userId: number;
+}

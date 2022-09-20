@@ -1,6 +1,16 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload} from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { TOKEN_KEY } from "../constants";
+
+interface AuthenticationRequest extends Request {
+    userID: number;
+}
+
+interface jwtBase {
+    userID: number;
+    exp: number;
+    iat: number;
+}
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     let token: string | undefined = req.headers["authorization"]?.toString();
@@ -11,14 +21,13 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     try {
         token = token.substring("Bearer ".length);
 
-        const decoded = jwt.verify(token, TOKEN_KEY);
-
-        
-    req.user = decoded;
-  } catch (err) {
-    return res.status(401).send("Invalid Token");
-  }
-  return next();
+        const decoded: string | JwtPayload = jwt.verify(token, TOKEN_KEY);
+        (req as AuthenticationRequest).userID = (decoded as jwtBase).userID;
+    }
+    catch (err) {
+        return res.status(401).send("Invalid Token");
+    }
+        return next();
 };
 
-module.exports = verifyToken;
+export default { verifyToken };

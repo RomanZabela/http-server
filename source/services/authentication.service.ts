@@ -27,6 +27,7 @@ export class AuthenticationService implements IAuthenticationService {
                         resolve(user.id);
                     } else {
                         reject(this.errorService.getError(AppError.NoData));
+                        console.log("didn't match!");
                     }
                 })
                 .catch((error: systemError) => {

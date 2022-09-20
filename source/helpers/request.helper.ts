@@ -1,5 +1,4 @@
-import { Response } from "express";
-import { ErrorCodes, GeneralMessage, NON_EXISTING_ID } from "../constants";
+import { NON_EXISTING_ID } from "../constants";
 import { systemError } from "../entities";
 import { AppError } from "../enum";
 import { ErrorService } from "../services/error.service";
