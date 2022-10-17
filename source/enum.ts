@@ -3,6 +3,11 @@ export enum Status {
     NotActive = 2
 }
 
+export enum Roles {
+    Aministrator = 1,
+    UsualUser = 2
+}
+
 export enum AppError {
     General = "General",
     ConnectionError = "ConnectionError",

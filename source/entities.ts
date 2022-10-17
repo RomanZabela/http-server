@@ -1,4 +1,5 @@
-import { AppError } from "./enum";
+import { Request } from "express";
+import { AppError, Roles } from "./enum";
 
 export interface Stores extends entityWithID{
     storeName: string;
@@ -24,6 +25,19 @@ export interface entityWithID {
     id: number;
 }
 
+export interface authenticationToken {
+    userData: jwsUserData;
+}
 export interface jwsUserData {
     userId: number;
+    roleID: Roles;
+}
+
+export interface AuthenticationRequest extends Request, authenticationToken { }
+
+export interface user extends entityWithID {
+    firstName: string;
+    lastName: string;
+    username?: string;
+    password?: string;
 }
