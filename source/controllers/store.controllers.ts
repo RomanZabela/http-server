@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { NON_EXISTING_ID } from '../constants';
-import { systemError, Stores } from '../entities';
-import { Status } from '../enum';
+import { AuthenticationRequest, systemError, Stores } from '../entities';
+//import { Status } from '../enum';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
 import { ErrorService } from '../services/error.service';
@@ -12,15 +12,17 @@ const errorService: ErrorService = new ErrorService();
 const storeService: StoreService = new StoreService(errorService);
 
 const getStores = async (req: Request, res: Response, next: NextFunction) => {
+    console.log("User data: ", (req: Request, res: Response, next: NextFunction) => {
     storeService.getStores()
-    .then((result: Stores[]) => {
-        return res.status(200).json({
-            message: result
+        .then((result: Stores[]) => {
+            return res.status(200).json({
+                types: result
+            });
+        })
+        .catch((error: systemError) => {
+            return ResponseHelper.handleError(res, error);
         });
     })
-    .catch((error: systemError) => {
-        return ResponseHelper.handleError(res, error);
-    });
 };
 
 const getStoreByID = async (req: Request, res: Response, next: NextFunction) => {
@@ -58,9 +60,9 @@ const updateStoreByID = async (req: Request, res: Response, next: NextFunction) 
                 storeAdress: "",
                 storeActive: 1,
                 storeUpdateDate: new Date(),
-            })
-            .then(() => {
-                return res.sendStatus(200);
+            }, (req as AuthenticationRequest).userData.userId)
+            .then((result: Stores) => {
+                return res.sendStatus(200).json(result);
             })
             .catch((error: systemError) => {
                 return ResponseHelper.handleError(res, error);
@@ -83,7 +85,7 @@ const addStore = async (req: Request, res: Response, next: NextFunction) => {
         storeAdress: body.storeAdress,
         storeActive: Status.Active,
         storeUpdateDate: new Date(),
-    })
+    }, (req as AuthenticationRequest).userData.userId)
     .then((result: Stores) => {
         return res.status(200).json(result);
     })

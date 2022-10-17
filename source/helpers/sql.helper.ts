@@ -1,4 +1,5 @@
-import { Connection, SqlClient, Error, QueryEvent, Query } from "msnodesqlv8";
+import { Connection, SqlClient, Error, Query, ProcedureManager, QueryEvent } from "msnodesqlv8";
+import { reject, result } from "underscore";
 import { DB_CLIENT, DB_CONNECTION_STRING, StoreQueries } from "../constants";
 import { entityWithID, systemError } from "../entities";
 import { AppError } from "../enum";
@@ -32,24 +33,25 @@ export class SQLHelper {
 
     public static executeQuerySingle<T>(errorService: ErrorService, query: string, ...params: (string | number)[]): Promise<T> {
         return new Promise<T>((resolve, reject) => {
-            SQLHelper.openConnection(errorService)
-            .then((connection: Connection) => {
+            try {
+                const connection: Connection = await SQLHelper.openConnection(errorService);
+                
                 connection.query(query, params, (queryError: Error | undefined, queryResult: T[] | undefined) => {
                     if (queryError) {
                         reject(errorService.getError(AppError.QueryError));
                     } else {
                         const notFoundError: systemError = errorService.getError(AppError.NoData);
-
+    
                         if (queryResult !== undefined) {
                             switch (queryResult.length) {
                                 case 0:
                                     reject(notFoundError);
                                     break;
-
+    
                                 case 1:
                                     resolve(queryResult[0]);
                                     break;
-                                
+                                    
                                 default:
                                     resolve(queryResult[0]);
                                     break;
@@ -59,11 +61,41 @@ export class SQLHelper {
                         }
                     }
                 });
-                
+            }                
+        catch(error: any) {
+                reject(error as systemError);                      
+        };
+    }
+
+    public static executeQueryNoResult(errorService: ErrorService, query: String, ignoreNoRowsAffected: Boolean, ...params: (string | number)[]): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            SQLHelper.openConnection(errorService)
+            .then((connection: Connection)=> {
+                const q: Query = connection.query(query, params, (queryError: Error | undefined) => {
+                    if (queryError) {
+                        switch (queryError.code) {
+                            case 547:
+                                reject(errorService.getError(AppError.DeletionConflict));
+                                break;
+                            default:
+                                reject(errorService.getError(AppError.QueryError));
+                                break;
+                        }
+                    }
+                });
+
+                q.on('rowcount', (rowCount: number) => {
+                    if (!ignoreNoRowsAffected as rowCount === 0) {
+                        reject(errorService.getError(AppError.NoData));
+                        return;
+                    }
+
+                    resolve();
+                });
             })
             .catch((error: systemError) => {
                 reject(error);
-            })                       
+            });
         });
     }
 
@@ -163,5 +195,20 @@ export class SQLHelper {
                 }
             });
         });
+    }
+
+    private static treatInsertResut(errorService: ErrorService, original: entityWithId, queryResult: entityWithId[] | undefined, resolve: (result: entityWithID) => void, reject: (error: systemError) => void): void {
+        const badQueryError: systemError = errorService.getError(AppError.QueryError);
+
+        if (queryResult !== undefined) {
+            if (queryResult.length === 1) {
+                original.id = queryResult[0].id;
+                resolve(original);
+            } else {
+                reject(badQueryError);
+            }
+        } else {
+            reject(badQueryError);
+        }
     }
 }

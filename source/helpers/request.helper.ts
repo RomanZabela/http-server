@@ -4,9 +4,6 @@ import { AppError } from "../enum";
 import { ErrorService } from "../services/error.service";
 
 export class RequestHelper {
-    // static handlerError(res: Response<any, Record<string, any>>, error: systemError): any {
-    //     throw new Error('Method not implemented.');
-    // }
 
     public static ParseNumericInput(errorService: ErrorService, input: string): number | systemError {
         let result: number = NON_EXISTING_ID;

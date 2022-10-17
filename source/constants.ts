@@ -10,6 +10,14 @@ export class StoreQueries {
     public static GetUserByLogin: string = "SELECT User_id, User_password FROM Users Where User_Login = ?;"
 }
 
+export class SqlParameters {
+    public static Id: string = "id";
+}
+
+export class StoredProcedures {
+    public static AddStore: string = "procedure_from_sql_manager"
+}
+
 export const DB_CONNECTION_STRING: string = "server=.;Database=Haifa_store;Trusted_Connection=Yes;Driver={SQL Server Native Client 11.0}";
 export const DB_CLIENT: string = "msnodesqlv8"
 export const NON_EXISTING_ID: number = -1;
