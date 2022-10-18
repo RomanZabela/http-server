@@ -14,6 +14,6 @@ export enum AppError {
     QueryError = "QueryError",
     NoData = "NoData",
     NonNumericInput = "NonNumericInput",
-    InputParameterSupplied = "InputParameterSupplied",
+    InputParameterNotSupplied = "InputParameterSupplied",
     DeletionConflict = "DeletionConflict"
 }

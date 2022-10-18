@@ -1,5 +1,4 @@
-import { Connection, SqlClient, Error, Query, ProcedureManager, QueryEvent } from "msnodesqlv8";
-import { reject, result } from "underscore";
+import { Connection, SqlClient, Error, Query, ProcedureManager } from "msnodesqlv8";
 import { DB_CLIENT, DB_CONNECTION_STRING, StoreQueries } from "../constants";
 import { entityWithID, systemError } from "../entities";
 import { AppError } from "../enum";
@@ -32,7 +31,7 @@ export class SQLHelper {
     }
 
     public static executeQuerySingle<T>(errorService: ErrorService, query: string, ...params: (string | number)[]): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
+        return new Promise<T>(async (resolve, reject) => {
             try {
                 const connection: Connection = await SQLHelper.openConnection(errorService);
                 
@@ -56,18 +55,22 @@ export class SQLHelper {
                                     resolve(queryResult[0]);
                                     break;
                             }
+
                         } else {
                             reject(notFoundError);
                         }
                     }
                 });
             }                
-        catch(error: any) {
+            catch(error: any) {
                 reject(error as systemError);                      
-        };
+            }
+        });
     }
 
-    public static executeQueryNoResult(errorService: ErrorService, query: String, ignoreNoRowsAffected: Boolean, ...params: (string | number)[]): Promise<void> {
+
+
+    public static executeQueryNoResult(errorService: ErrorService, query: string, ignoreNoRowsAffected: boolean, ...params: (string | number)[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             SQLHelper.openConnection(errorService)
             .then((connection: Connection)=> {
@@ -85,7 +88,7 @@ export class SQLHelper {
                 });
 
                 q.on('rowcount', (rowCount: number) => {
-                    if (!ignoreNoRowsAffected as rowCount === 0) {
+                    if (!ignoreNoRowsAffected && rowCount === 0) {
                         reject(errorService.getError(AppError.NoData));
                         return;
                     }
@@ -197,18 +200,16 @@ export class SQLHelper {
         });
     }
 
-    private static treatInsertResut(errorService: ErrorService, original: entityWithId, queryResult: entityWithId[] | undefined, resolve: (result: entityWithID) => void, reject: (error: systemError) => void): void {
-        const badQueryError: systemError = errorService.getError(AppError.QueryError);
+    private static treatInsertResut(queryResult: entityWithID[] | undefined): number | null {
 
         if (queryResult !== undefined) {
             if (queryResult.length === 1) {
-                original.id = queryResult[0].id;
-                resolve(original);
+                return queryResult[0].id;
             } else {
-                reject(badQueryError);
+                return null;
             }
         } else {
-            reject(badQueryError);
+            return null;
         }
     }
 }

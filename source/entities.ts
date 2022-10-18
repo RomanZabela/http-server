@@ -1,7 +1,7 @@
 import { Request } from "express";
 import { AppError, Roles } from "./enum";
 
-export interface Stores extends entityWithID{
+export interface Stores extends entityWithID {
     storeName: string;
     storeAdress: string;
     storeCapacity: number;

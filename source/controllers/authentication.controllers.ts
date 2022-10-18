@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthenticationService } from '../services/authentication.service';
 import { ErrorService } from '../services/error.service';
-import { systemError, jwsUserData } from '../entities';
+import { systemError, jwsUserData, authenticationToken } from '../entities';
 import { ResponseHelper } from '../helpers/response.helper';
 import { TOKEN_KEY } from '../constants';
 import jwt from 'jsonwebtoken';

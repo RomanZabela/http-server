@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import routes from './routes/posts';
 import storeroutes from './routes/store.route';
 import authentication from './routes/authentication.route';
+import userRoutes from './routes/user.routes';
 
 const router: Express = express();
 
@@ -33,6 +34,7 @@ router.use((req, res, next) => {
 router.use('/demo', routes);
 router.use('/general',storeroutes.route);
 router.use('/auth',authentication.router);
+router.use('/user/', userRoutes.router);
 
 /** Error handling */
 router.use((req, res, next) => {
@@ -45,4 +47,8 @@ router.use((req, res, next) => {
 /** Server */
 const httpServer = http.createServer(router);
 const PORT: any = process.env.PORT ?? 6060;
-httpServer.listen(PORT, () => console.log(`The server is running on port ${PORT}`));
+httpServer.listen(
+    PORT,
+    () => {
+        console.log(`The server is running on port ${PORT}`);
+    });

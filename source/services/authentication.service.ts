@@ -1,16 +1,17 @@
 import bcrypt from "bcryptjs";
 import { StoreQueries } from "../constants";
-import { entityWithID, systemError } from "../entities";
-import { AppError } from "../enum";
+import { entityWithID, jwsUserData, systemError } from "../entities";
+import { AppError, Roles } from "../enum";
 import { SQLHelper } from "../helpers/sql.helper";
 import { ErrorService } from "./error.service";
 
 interface localUser extends entityWithID {
     password: string;
+    role_id: Roles;
 }
 
 interface IAuthenticationService {
-    login(username: string, password: string): Promise<number>;
+    login(username: string, password: string): Promise<jwsUserData>;
 }
 
 export class AuthenticationService implements IAuthenticationService {
@@ -19,20 +20,21 @@ export class AuthenticationService implements IAuthenticationService {
         private errorService: ErrorService
     ) { }
 
-    public login(username: string, password: string): Promise<number> {
-        return new Promise<number>((resolve, reject) => {
-            SQLHelper.executeQuerySingle<localUser>(this.errorService, StoreQueries.GetUserByLogin, username)
-                .then((user: localUser) => {
-                    if (bcrypt.compareSync(password, user.password)) {
-                        resolve(user.id);
-                    } else {
-                        reject(this.errorService.getError(AppError.NoData));
-                        console.log("didn't match!");
+    public async login(username: string, password: string): Promise<jwsUserData> {
+        try {
+            const user: localUser = await SQLHelper.executeQuerySingle<localUser>(this.errorService, StoreQueries.GetUserByLogin, username)
+            if (bcrypt.compareSync(password, user.password)) {
+                const result: jwsUserData = {
+                    userId: user.id,
+                    roleID: user.role_id
+                }
+                return result;
+            } else {
+                    throw (this.errorService.getError(AppError.NoData));
                     }
-                })
-                .catch((error: systemError) => {
-                    reject(error);
-                })
-        });
-    }
+        }
+        catch(error: any) {
+            throw (error as systemError);
+            }
+    };
 }

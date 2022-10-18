@@ -1,14 +1,14 @@
 import { reject, result } from "underscore";
 import { SqlParameters, StoreQueries } from "../constants";
-import { entityWithID, systemError } from "../entities";
+import { entityWithID, systemError, user } from "../entities";
 import { Roles, Status } from "../enum";
 import { DateHelper } from "../helpers/date.helper";
 import { SQLHelper } from "../helpers/sql.helper";
 import { ErrorService } from "./error.service";
 
 interface IUserService {
-    updateById(user: User, userId: number): Promise<User>;
-    add(user: User, userId: number): Promise<User>;
+    updateById(user: user, userId: number): Promise<user>;
+    add(user: user, userId: number): Promise<user>;
     deleteById(id: number, userId: number): Promise<void>;
 }
 
@@ -18,13 +18,13 @@ export class UserService implements IUserService {
         private errorService: ErrorService
     ) { }
 
-    public updateById(user: User, userId: number): Promise<User> {
-        return new Promise<User>((resolve, reject) => {
+    public updateById(user: user, userId: number): Promise<user> {
+        return new Promise<user>((resolve, reject) => {
             const createDate: string = DateHelper.dateToString(new Date());
 
             SQLHelper.createNew(this.errorService, StoreQueries.AddUser, user, user.firstName, user.lastName, user.username as string, Roles.UsualUser, createDate, userId, Status.Active)
                 .then ((result: entityWithID) => {
-                    resolve(result as User);
+                    resolve(result as user);
                 })
                 .catch((error: systemError) => {
                     reject(error);
@@ -32,13 +32,13 @@ export class UserService implements IUserService {
         });
     }
 
-    public add(user: User, userId: number): Promise<User>{
-        return new Promise<User>((resolve, reject) => {
+    public add(user: user, userId: number): Promise<user>{
+        return new Promise<user>((resolve, reject) => {
             const createDate: string = DateHelper.dateToString(new Date);
 
             SQLHelper.createNew(this.errorService, StoreQueries.AddUser, user, user.firstName, user.lastName, user.username as string, Roles.UsualUser, createDate, userId, Status.Active)
                 .then((result: entityWithID) => {
-                    resolve(result as User);
+                    resolve(result as user);
                 })
                 .catch((error: ErrorService) => {
                     reject(error);

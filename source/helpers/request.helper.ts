@@ -15,7 +15,7 @@ export class RequestHelper {
         if (input !== null && input !== undefined) {
             result = parseInt(input);
         } else {
-            return errorService.getError(AppError.InputParameterSupplied);
+            return errorService.getError(AppError.InputParameterNotSupplied);
         }
 
         return result;

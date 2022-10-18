@@ -1,5 +1,5 @@
 import * as _ from "underscore";
-import { StoreQueries, TEMP_USER_ID} from "../constants";
+import { StoreQueries} from "../constants";
 import { systemError, Stores, entityWithID } from "../entities";
 import { Status } from "../enum";
 import { SQLHelper } from "../helpers/sql.helper";
@@ -24,16 +24,19 @@ interface IStoreService {
 export class StoreService implements IStoreService { 
    
     // get all stores name
+    private _errorService: ErrorService;
 
     constructor(
         private errorService: ErrorService
-    ) { }
+    ) { 
+        this._errorService = errorService;
+    }
 
     public getStores(): Promise<Stores[]> {
         return new Promise<Stores[]>((resolve, reject) => {
             const result: Stores[] = [];
             
-            SQLHelper.executeQueryArray<localStores>(this.errorService, StoreQueries.getStores, Status.Active)
+            SQLHelper.executeQueryArray<localStores>(this._errorService, StoreQueries.getStores, Status.Active)
             .then ((queryResult: localStores[]) => {
                 queryResult.forEach((StoresType: localStores) => {
                     result.push(this.parseLocalStore(StoresType));
@@ -78,7 +81,7 @@ export class StoreService implements IStoreService {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
 
-            SQLHelper.createNew(this.errorService, StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate, Status.Active)
+            SQLHelper.createNew(this._errorService, StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate, Status.Active)
                 .then((result: entityWithID) => {
                     resolve(result as Stores);
                 }) 
