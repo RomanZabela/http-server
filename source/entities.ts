@@ -6,7 +6,7 @@ export interface Stores extends entityWithID {
     storeAdress: string;
     storeCapacity: number;
     storeActive: number;
-    storeUpdateDate: Date;
+    storeUpdateDate: string;
 }
 
 export interface systemError {

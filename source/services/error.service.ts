@@ -48,8 +48,8 @@ export class ErrorService implements IErrorService {
             message: "Non numeric input supplier!"
         };
 
-        this._error[AppError.InputParameterSupplied] = {
-            key: AppError.InputParameterSupplied,
+        this._error[AppError.InputParameterNotSupplied] = {
+            key: AppError.InputParameterNotSupplied,
             code: 104,
             message: "Input parametr not supplied!"
         };

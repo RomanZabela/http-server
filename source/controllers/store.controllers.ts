@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { NON_EXISTING_ID } from '../constants';
 import { AuthenticationRequest, systemError, Stores } from '../entities';
 import { Status } from '../enum';
+import { DateHelper } from '../helpers/date.helper';
 //import { Status } from '../enum';
 import { RequestHelper } from '../helpers/request.helper';
 import { ResponseHelper } from '../helpers/response.helper';
@@ -59,7 +60,8 @@ const updateStoreByID = async (req: Request, res: Response, next: NextFunction) 
                 storeCapacity: body.storeCapacity,
                 storeName: body.storeName,
                 storeAdress: "",
-                storeActive: 1
+                storeActive: 1,
+                storeUpdateDate: "",
             }, (req as AuthenticationRequest).userData.userId)
             .then((result: Stores) => {
                 return res.status(200).json(result);
@@ -83,6 +85,8 @@ const addStore = async (req: Request, res: Response, next: NextFunction) => {
         storeCapacity: body.storeCapacity,
         storeName: body.storeName,
         storeAdress: body.storeAdress,
+        storeUpdateDate: "",
+        storeActive: Status.Active,
     }, (req as AuthenticationRequest).userData.userId)
     .then((result: Stores) => {
         return res.status(200).json(result);

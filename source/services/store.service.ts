@@ -11,14 +11,14 @@ interface localStores {
     Store_Address: string;
     Store_Capacity: number;
     Store_Field_Type: number;
-    Store_Field_Update: Date;
+    Store_Update_Date: string;
 }
 
 interface IStoreService {
     getStores(): Promise<Stores[]>;
     getStore(id: number): Promise<Stores>;
-    updateStore(Stores: Stores): Promise<void>;
-    addStore(Stores: Stores): Promise<Stores>;
+    updateStore(Stores: Stores, userId: number): Promise<Stores>;
+    addStore(Stores: Stores, userId: number): Promise<Stores>;
 }
 
 export class StoreService implements IStoreService { 
@@ -65,11 +65,12 @@ export class StoreService implements IStoreService {
 
     //update store field by name
 
-    public updateStore(storeType: Stores): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            SQLHelper.executeQueryUpdate(this.errorService, StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.id, Status.Active)
+    public updateStore(storeType: Stores, userId: number): Promise<Stores> {
+        return new Promise<Stores>((resolve, reject) => {
+            const updateDate: Date = new Date();
+            SQLHelper.executeQueryUpdate(this._errorService, StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.id, Status.Active)
             .then(() => {
-                resolve();
+                resolve(storeType);
             })
             .catch((error: systemError) => {
                 reject(error);
@@ -77,7 +78,7 @@ export class StoreService implements IStoreService {
         });
     }
 
-    public addStore(Stores: Stores): Promise<Stores> {
+    public addStore(Stores: Stores, userId: number): Promise<Stores> {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
 
@@ -98,7 +99,7 @@ export class StoreService implements IStoreService {
             storeAdress: local.Store_Address,
             storeCapacity: local.Store_Capacity,
             storeActive: local.Store_Field_Type,
-            storeUpdateDate: local.Store_Field_Update,
+            storeUpdateDate: local.Store_Update_Date,
         }
     }
 }
