@@ -33,7 +33,7 @@ router.use((req, res, next) => {
 /** Routes */
 router.use('/demo', routes);
 router.use('/general',storeroutes.route);
-router.use('/auth',authentication.router);
+router.use('/auth/',authentication.router);
 router.use('/user/', userRoutes.router);
 
 /** Error handling */
