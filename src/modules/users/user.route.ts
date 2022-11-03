@@ -1,14 +1,17 @@
 import { RouteConfig } from "../../framework/route.config"
 import express, { Application, Request, Response } from "express"
 import UserController from "./user.controller"
+import authMiddleware from "../../core/midlleware/auth.middleware";
+import { Roles } from "../../enum";
 export class UserRoutes extends RouteConfig {
 
   constructor(app: Application) {
-    super(app, "UserRoutes")
+    super(app, "UserRoutes", "user");
   }
 
   public configureRoutes() {
-    this.app.route(`/user/:id`).get([UserController.getUsersById])
+    this.app.route(`/${this.baseUrl}/:id`).get([authMiddleware.verifyToken([Roles.Administrator]), UserController.getUsersById])
+    this.app.route(`/${this.baseUrl}/:id`).put([authMiddleware.verifyToken([Roles.Administrator]), UserController.updateById])
     return this.app
   }
 

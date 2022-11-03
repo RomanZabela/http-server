@@ -1,33 +1,38 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import { AuthenticationRequest, jwsUserData } from "../../entities";
+import { Roles } from "../../enum";
+import { TOKEN_KEY } from "../../constants";
 
-const log: IDebugger = debug("middleware:JWT");
+interface jwtBase {
+    userData: jwsUserData;
+    exp: number;
+    iat: number;
+}
 
 class AuthMidlleware {
 
-    authenticateJWT(req: Request, res: Response, next: NextFunction) {
+    public verifyToken = (roles: Roles[]) => (req: Request, res: Response, next: NextFunction) => {
+        let token: string | undefined = req.headers["authorization"]?.toString();
 
-        const authHeader = req.headers.authorization    
-        if (authHeader && authHeader !== "null") {
-
-          // const token = authHeader.split(" ")[1];    
-            log("auth Header", TOKEN_KEY)    
-            jwt.verify(authHeader, TOKEN_KEY, (err: any, user: any) => {    
-                if (err) {    
-                    log("Error", err)
-                    return res
-                    .status(403)
-                    .send({ success: false, message: "Token Expired" })
-                }
-            req.user = user
-            next()    
-          })
-    
-        } else {    
-          res.status(403).json({ success: false, message: "UnAuthorized" })    
+        if (!token) {
+            return res.status(403).send("A token is required for authentication");
         }
-    
-      }
+
+        try {
+            //'Bearer'
+            token = token.substring("Bearer ".length);
+            const decoded: string | JwtPayload = jwt.verify(token, TOKEN_KEY);
+            if (roles.indexOf((decoded as jwtBase).userData.roleID) === -1) {
+                return res.sendStatus(401);
+            }
+            (req as AuthenticationRequest).userData = (decoded as jwtBase).userData;
+        } catch (err) {
+            return res.status(401).send("Invalid Token");
+        }
+
+        return next();
+    }
     
     }
     

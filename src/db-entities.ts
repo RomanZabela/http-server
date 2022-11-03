@@ -5,7 +5,7 @@ export enum ColumnType {
 }
 
 export enum TableNames {
-    User = "[user]"
+    User = "Users"
 }
 
 export interface tableDefinition {

@@ -4,7 +4,7 @@ export enum Status {
 }
 
 export enum Roles {
-    Aministrator = 1,
+    Administrator = 1,
     UsualUser = 2
 }
 

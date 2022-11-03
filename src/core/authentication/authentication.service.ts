@@ -1,37 +1,35 @@
 import bcrypt from "bcryptjs";
-import { StoreQueries } from "../constants";
-import { entityWithID, jwsUserData, systemError } from "../entities";
-import { AppError, Roles } from "../enum";
-import { SQLHelper } from "../helpers/sql.helper";
-import { ErrorService } from "./error.service";
+import { StoreQueries } from "../../constants";
+import { jwsUserData, systemError } from "../../entities";
+import { AppError, Roles } from "../../enum";
+import { SQLHelper } from "../sql.helper";
+import ErrorService from "../error.service";
 
 interface localUser {
     User_id: number;
     User_password: string;
-    role_id: Roles;
+    Role_ID: Roles;
 }
 
 interface IAuthenticationService {
     login(username: string, password: string): Promise<jwsUserData>;
 }
 
-export class AuthenticationService implements IAuthenticationService {
+class AuthenticationService implements IAuthenticationService {
     
-    constructor(
-        private errorService: ErrorService
-    ) { }
+    constructor() { }
 
     public async login(username: string, password: string): Promise<jwsUserData> {
         try {
-            const user: localUser = await SQLHelper.executeQuerySingle<localUser>(this.errorService, StoreQueries.GetUserByLogin, username)
+            const user: localUser = await SQLHelper.executeQuerySingle<localUser>(StoreQueries.GetUserByLogin, username)
             if (bcrypt.compareSync(password, user.User_password)) {
                 const result: jwsUserData = {
                     userId: user.User_id,
-                    roleID: user.role_id
+                    roleID: user.Role_ID
                 }
                 return result;
             } else {
-                    throw (this.errorService.getError(AppError.NoAuthentication));
+                    throw (ErrorService.getError(AppError.NoAuthentication));
                     }
         }
         catch(error: any) {
@@ -39,3 +37,5 @@ export class AuthenticationService implements IAuthenticationService {
             }
     };
 }
+
+export default new AuthenticationService();
