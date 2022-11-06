@@ -11,7 +11,7 @@ import errorService from "../../core/error.service";
 
 interface IUserService {
     getById(userId: number): Promise<user>;
-    updateById(user: user, userId: number): Promise<user>;
+    updateById(user: user, userId: number): Promise<void>;
     //add(user: user, userId: number): Promise<user>;
     //deleteById(id: number, userId: number): Promise<void>;
 }
@@ -24,25 +24,19 @@ class UserService implements IUserService {
         return await DbService.getFromTableById(TableNames.User, userId);
     }
 
-    public updateById(user: user, userId: number): Promise<user> {
-        return new Promise<user>((resolve, reject) => {
+    public async updateById(user: user, userId: number): Promise<void> {
+        try {
+        //return new Promise<user>((resolve, reject) => {
             const createDate: Date = new Date();
 
-            //const hashedPassword: string = hash(user.User_Password as string, 12);
+            const hashedPassword = await hash(user.User_Password as string, 12);
 
-            SQLHelper.executeQueryNoResult(StoreQueries.UpdateUserById, false, user.User_Login as string, DateHelper.dateToString(createDate), userId, user.id, Status.Active)
-                .then (() => {
-                    resolve(user);
-                })
-                .catch((error: systemError) => {
-                    reject(error);
-                });
-        });
-    }
-
-    private getHash(password: string): Promise<string> {
-        return hash(password, 12)
-      }
+            await SQLHelper.executeQueryUpdate(StoreQueries.UpdateUserById, user.User_Login as string, hashedPassword, userId, DateHelper.dateToString(createDate), user.id, Status.Active);
+        }
+        catch(error: any) {
+            throw (error as systemError);
+        }
+    };
 
 //     public add(user: user, userId: number): Promise<user>{
 //         return new Promise<user>((resolve, reject) => {

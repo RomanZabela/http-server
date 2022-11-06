@@ -28,13 +28,13 @@ class UserController {
     if (typeof(numericParamOrError) === "number") {
       if (numericParamOrError > 0) {
         const body: user = req.body;
-        const result: user = await UserService.getById(numericParamOrError);
+        //const result: user = await UserService.getById(numericParamOrError);
         UserService.updateById({
           id: numericParamOrError,
-          User_FirstName: body.User_FirstName,
-          User_LastName: body.User_LastName
+          User_Login: body.User_Login,
+          User_Password: body.User_Password
         }, (req as AuthenticationRequest).userData.userId)
-        .then ((result: user) => {
+        .then ((result: void) => {
           return res.status(200).json(result);
         })
         .catch((error: systemError) => {

@@ -15,7 +15,7 @@ export class StoreQueries {
                                             INNER JOIN Users_Roles AS ur ON ur.Role_ID = a.Access_Users_Roles_ID 
                                             WHERE u.User_Login = ?`;
 
-    public static UpdateUserById: string = "UPDATE User SET User_Login = '?', User_Update_Date = '?', User_User_ID = ? WHERE User_id = ? AND User_Field_Type = ?";
+    public static UpdateUserById: string = `UPDATE Users SET User_Login = ?, User_Password = ?, User_User_ID = ?, User_Update_Date = ? WHERE User_id = ? AND User_Field_Type = ?`;
     public static AddUser: string = "";
     public static DeleteUserById: string = "";
 }

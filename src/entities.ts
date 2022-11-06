@@ -36,8 +36,6 @@ export interface jwsUserData {
 export interface AuthenticationRequest extends Request, authenticationToken { }
 
 export interface user extends entityWithID {
-    User_FirstName: string;
-    User_LastName: string;
     User_Login?: string;
     User_Password?: string;
 }
