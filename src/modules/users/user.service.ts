@@ -1,5 +1,5 @@
 import { TableNames } from "../../db-entities";
-import { systemError, user } from "../../entities";
+import { entityWithID, systemError, user } from "../../entities";
 import DbService from "../../core/db.service";
 import { SQLHelper } from "../../core/sql.helper";
 import { StoreQueries } from "../../constants";
@@ -12,7 +12,7 @@ import errorService from "../../core/error.service";
 interface IUserService {
     getById(userId: number): Promise<user>;
     updateById(user: user, userId: number): Promise<void>;
-    //add(user: user, userId: number): Promise<user>;
+    addUser(user: user, userId: number): Promise<user>;
     //deleteById(id: number, userId: number): Promise<void>;
 }
 
@@ -29,28 +29,30 @@ class UserService implements IUserService {
         //return new Promise<user>((resolve, reject) => {
             const createDate: Date = new Date();
 
-            const hashedPassword = await hash(user.User_Password as string, 12);
+            const hashedPassword = await hash(user.User_Password as string, 10);
 
-            await SQLHelper.executeQueryUpdate(StoreQueries.UpdateUserById, user.User_Login as string, hashedPassword, userId, DateHelper.dateToString(createDate), user.id, Status.Active);
+            await SQLHelper.executeQueryUpdate(StoreQueries.UpdateUserById, user.User_Login as string, hashedPassword, userId, DateHelper.dateToString(createDate), user.ID, Status.Active);
         }
         catch(error: any) {
             throw (error as systemError);
         }
     };
 
-//     public add(user: user, userId: number): Promise<user>{
-//         return new Promise<user>((resolve, reject) => {
-//             const createDate: string = DateHelper.dateToString(new Date);
+    public async addUser(user: user, userId: number): Promise<user>{
+        try {
 
-//             SQLHelper.createNew(this.errorService, StoreQueries.AddUser, user, user.User_FirstName, user.User_LastName, user.User_Login as string, Roles.UsualUser, createDate, userId, Status.Active)
-//                 .then((result: entityWithID) => {
-//                     resolve(result as user);
-//                 })
-//                 .catch((error: ErrorService) => {
-//                     reject(error);
-//                 });
-//         });
-//     }
+            const createDate: string = DateHelper.dateToString(new Date);
+
+            const hashedPassword = await hash(user.User_Password as string, 10);
+
+            return await SQLHelper.createNew(StoreQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId) as user;
+            
+            }
+        catch(error: any) {
+            throw(error as systemError);
+        };
+    };
+
 
 //     public deleteById(id: number, userId: number): Promise<void> {
 //         return new Promise<void>((resolve, reject) => {

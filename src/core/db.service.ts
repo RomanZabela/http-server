@@ -18,8 +18,8 @@ class DbService implements IDbService {
 
     constructor() {
         this._tables[TableNames.User] = this.addTableToContext<user>(TableNames.User, [{
-            dbName: "User_id",
-            name: "id",
+            dbName: "ID",
+            name: "ID",
             type: ColumnType.Integer,
             isForOutput: true,
             isQueriable: true

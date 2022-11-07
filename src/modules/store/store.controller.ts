@@ -3,6 +3,7 @@ import { NON_EXISTING_ID } from "../../constants";
 import { RequestHelper } from "../../core/request.helper";
 import { AuthenticationRequest, Stores, systemError } from "../../entities";
 import { Status } from "../../enum";
+import { DateHelper } from "../../framework/date.helper";
 import { ResponseHelper } from "../../framework/response.helper";
 import StoreService from "../store/store.service";
 
@@ -50,13 +51,15 @@ class StoreController {
             if (numericParamOrError > 0) {
                 const body: Stores = req.body;
 
+                const createDate: Date = new Date();
+
                 StoreService.updateStore({
-                    id: numericParamOrError,
+                    ID: numericParamOrError,
                     storeCapacity: body.storeCapacity,
                     storeName: body.storeName,
-                    storeAdress: "HaManiem 31",
+                    storeAdress: body.storeAdress,
                     storeActive: Status.Active,
-                    storeUpdateDate: ""
+                    storeUpdateDate: DateHelper.dateToString(createDate)
                 }, (req as AuthenticationRequest).userData.userId)
                 .then((result: Stores) => {
                     return res.status(200).json(result);
@@ -75,16 +78,18 @@ class StoreController {
     async addStore(req: Request, res: Response, next: NextFunction) {
         const body: Stores = req.body;
 
+        const createDate: Date = new Date();
+
         StoreService.addStore({
-            id: NON_EXISTING_ID,
+            ID: NON_EXISTING_ID,
             storeCapacity: body.storeCapacity,
             storeName: body.storeName,
             storeAdress: body.storeAdress,
-            storeUpdateDate: "",
+            storeUpdateDate: DateHelper.dateToString(createDate),
             storeActive: Status.Active,
         }, (req as AuthenticationRequest).userData.userId)
         .then((result: Stores) => {
-            return res.status(200).json(result);
+            return res.status(200).json(result.storeName);
         })
         .catch((error: systemError) => {
             return ResponseHelper.handleError(res, error);

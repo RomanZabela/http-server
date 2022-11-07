@@ -5,7 +5,7 @@ import { Status } from "../../enum";
 import { SQLHelper } from "../../core/sql.helper";
 
 interface localStores {
-    Store_ID: number;
+    ID: number;
     Store_Name: string;
     Store_Address: string;
     Store_Capacity: number;
@@ -63,7 +63,7 @@ class StoreService implements IStoreService {
     public updateStore(storeType: Stores, userId: number): Promise<Stores> {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
-            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.id, storeType.storeActive)
+            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.ID, storeType.storeActive)
             .then(() => {
                 resolve(storeType);
             })
@@ -77,7 +77,7 @@ class StoreService implements IStoreService {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
 
-            SQLHelper.createNew(StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate, Status.Active)
+            SQLHelper.createNew(StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate, Status.Active, userId)
                 .then((result: entityWithID) => {
                     resolve(result as Stores);
                 }) 
@@ -89,7 +89,7 @@ class StoreService implements IStoreService {
 
     private parseLocalStore(local: localStores): Stores {
         return {
-            id: local.Store_ID,
+            ID: local.ID,
             storeName: local.Store_Name,
             storeAdress: local.Store_Address,
             storeCapacity: local.Store_Capacity,

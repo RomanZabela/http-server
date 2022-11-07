@@ -1,27 +1,28 @@
 export class StoreQueries {
     public static getStores: string = "SELECT * FROM dbo.Stores";
-    public static getStoreByID: string = "SELECT Store_Name FROM dbo.Stores WHERE Store_ID = ?";
-    public static updateStoreCapacity: string = "UPDATE Stores SET Store_Capacity = ?, Store_Name = ? WHERE Store_ID = ?";
+    public static getStoreByID: string = "SELECT Store_Name FROM dbo.Stores WHERE ID = ?";
+    public static updateStoreCapacity: string = "UPDATE Stores SET Store_Capacity = ?, Store_Name = ? WHERE ID = ?";
 
-    public static selectIdentity: string = "SELECT SCOPE_IDENTITY() AS id;";
-    public static addNewStore: string = "INSERT INTO Stores (Store_Name, Store_Address, Store_Capacity, Store_Field_Type, Store_Update_Date) Values (?, ?, ?, ?, ?)";
-    public static deleteStore: string = "UPDATE Stores SET Store_Field_Update = ?, Store_Field_Type = ? WHERE Store_ID = ? AND Store_Field_type = 1";
+    public static selectIdentity: string = "SELECT SCOPE_IDENTITY() AS ID;";
+    public static addNewStore: string = "INSERT INTO Stores (Store_Name, Store_Address, Store_Capacity, Store_Field_Type, Store_Update_Date, Store_User_ID) Values (?, ?, ?, ?, ?, ?)";
+    public static deleteStore: string = "UPDATE Stores SET Store_Field_Update = ?, Store_Field_Type = ? WHERE ID = ? AND Store_Field_type = 1";
 
-    public static GetUserByLogin: string = `SELECT u.User_id,
+    public static GetUserByLogin: string = `SELECT u.ID,
                                                 u.User_password,
-                                                ur.Role_ID
+                                                ur.ID as Role_ID
                                             FROM Users AS u 
-                                            INNER JOIN Access AS a ON a.Access_User_ID = u.User_id 
-                                            INNER JOIN Users_Roles AS ur ON ur.Role_ID = a.Access_Users_Roles_ID 
+                                            INNER JOIN Access AS a ON a.Access_User_ID = u.ID 
+                                            INNER JOIN Users_Roles AS ur ON ur.ID = a.Access_Users_Roles_ID 
                                             WHERE u.User_Login = ?`;
 
-    public static UpdateUserById: string = `UPDATE Users SET User_Login = ?, User_Password = ?, User_User_ID = ?, User_Update_Date = ? WHERE User_id = ? AND User_Field_Type = ?`;
-    public static AddUser: string = "";
+    public static UpdateUserById: string = `UPDATE Users SET User_Login = ?, User_Password = ?, User_User_ID = ?, User_Update_Date = ? WHERE ID = ? AND User_Field_Type = ?`;
+    public static AddUser: string = `Insert into Users (User_Employee_ID, User_Login, User_Password, User_Field_Type, User_Update_Date, User_User_ID)
+                                    Values (?, ?, ?, ?, ?, ?)`;
     public static DeleteUserById: string = "";
 }
 
 export class SqlParameters {
-    public static Id: string = "id";
+    public static Id: string = "ID";
 }
 
 export class StoredProcedures {

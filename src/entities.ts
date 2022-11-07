@@ -22,7 +22,7 @@ export interface sqlParametr {
 }
 
 export interface entityWithID {
-    id: number;
+    ID: number;
 }
 
 export interface authenticationToken {
@@ -36,6 +36,7 @@ export interface jwsUserData {
 export interface AuthenticationRequest extends Request, authenticationToken { }
 
 export interface user extends entityWithID {
+    user_Employee_ID: number;
     User_Login?: string;
     User_Password?: string;
 }

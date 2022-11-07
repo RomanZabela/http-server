@@ -24,7 +24,7 @@ export class DbTable<T> implements IDbTable<T> {
 
     public async getById<T>(id: number): Promise<T> {
         let queriedFields: string = map(filter(this._table.fields, (column: columnDefinition) => column.isForOutput), (column: columnDefinition) => column.dbName).join(", ");
-        let sql: string = `SELECT ${queriedFields} FROM ${this._table.name} WHERE User_id = ?`;
+        let sql: string = `SELECT ${queriedFields} FROM ${this._table.name} WHERE ID = ?`;
 
         const result: T = await SQLHelper.executeQuerySingle<T>(sql, id)
 

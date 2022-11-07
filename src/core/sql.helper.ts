@@ -138,7 +138,7 @@ export class SQLHelper {
                         if (executionCounter === queries.length) {
                             if (queryResult !== undefined) {
                                 if (queryResult.length === 1) {
-                                    original.id = queryResult[0].id;
+                                    original.ID = queryResult[0].ID;
                                     resolve(original);
                                 } else {
                                     reject(badQueryError);
@@ -204,7 +204,7 @@ export class SQLHelper {
 
         if (queryResult !== undefined) {
             if (queryResult.length === 1) {
-                return queryResult[0].id;
+                return queryResult[0].ID;
             } else {
                 return null;
             }

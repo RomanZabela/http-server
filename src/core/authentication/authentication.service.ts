@@ -1,12 +1,11 @@
 import bcrypt from "bcryptjs";
 import { StoreQueries } from "../../constants";
-import { jwsUserData, systemError } from "../../entities";
+import { entityWithID, jwsUserData, systemError } from "../../entities";
 import { AppError, Roles } from "../../enum";
 import { SQLHelper } from "../sql.helper";
 import ErrorService from "../error.service";
 
-interface localUser {
-    User_id: number;
+interface localUser extends entityWithID{
     User_password: string;
     Role_ID: Roles;
 }
@@ -24,7 +23,7 @@ class AuthenticationService implements IAuthenticationService {
             const user: localUser = await SQLHelper.executeQuerySingle<localUser>(StoreQueries.GetUserByLogin, username)
             if (bcrypt.compareSync(password, user.User_password)) {
                 const result: jwsUserData = {
-                    userId: user.User_id,
+                    userId: user.ID,
                     roleID: user.Role_ID
                 }
                 return result;

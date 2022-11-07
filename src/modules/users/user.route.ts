@@ -12,6 +12,7 @@ export class UserRoutes extends RouteConfig {
   public configureRoutes() {
     this.app.route(`/${this.baseUrl}/:id`).get([authMiddleware.verifyToken([Roles.Administrator]), UserController.getUsersById])
     this.app.route(`/${this.baseUrl}/:id`).put([authMiddleware.verifyToken([Roles.Administrator]), UserController.updateById])
+    this.app.route(`/${this.baseUrl}`).post([authMiddleware.verifyToken([Roles.Administrator]), UserController.addUser])
     return this.app
   }
 
