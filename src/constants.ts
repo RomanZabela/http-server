@@ -18,6 +18,8 @@ export class StoreQueries {
     public static UpdateUserById: string = `UPDATE Users SET User_Login = ?, User_Password = ?, User_User_ID = ?, User_Update_Date = ? WHERE ID = ? AND User_Field_Type = ?`;
     public static AddUser: string = `Insert into Users (User_Employee_ID, User_Login, User_Password, User_Field_Type, User_Update_Date, User_User_ID)
                                     Values (?, ?, ?, ?, ?, ?)`;
+
+    public static GetUserIDByEmployeeID: string = "SELECT ID FROM Users WHERE User_Employee_ID = ?";
     public static DeleteUserById: string = "";
 }
 

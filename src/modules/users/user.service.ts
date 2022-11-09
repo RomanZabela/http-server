@@ -12,7 +12,8 @@ import errorService from "../../core/error.service";
 interface IUserService {
     getById(userId: number): Promise<user>;
     updateById(user: user, userId: number): Promise<void>;
-    addUser(user: user, userId: number): Promise<user>;
+    addUser(user: user, userId: number): Promise<entityWithID>;
+    getUserIDByEmployeeID(user_Employee_ID: number): Promise<number>
     //deleteById(id: number, userId: number): Promise<void>;
 }
 
@@ -38,15 +39,36 @@ class UserService implements IUserService {
         }
     };
 
-    public async addUser(user: user, userId: number): Promise<user>{
+    public async addUser(user: user, userId: number): Promise<entityWithID>{
         try {
 
-            const createDate: string = DateHelper.dateToString(new Date);
+            let result: entityWithID;
 
-            const hashedPassword = await hash(user.User_Password as string, 10);
+            try{
+                await this.getUserIDByEmployeeID(user.user_Employee_ID);
+            }
+            catch(error){
+                const createDate: string = DateHelper.dateToString(new Date);
 
-            return await SQLHelper.createNew(StoreQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId) as user;
+                const hashedPassword = await hash(user.User_Password as string, 10);
+    
+                result = await SQLHelper.createNew(StoreQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId);
+            }
             
+            //result = this.getById
+            return result = user;
+
+            }
+        catch(error: any) {
+            throw(error as systemError);
+        };
+    };
+
+    public async getUserIDByEmployeeID(user_Employee_ID: number): Promise<number>{
+        try {
+
+            return await SQLHelper.executeQuerySingle(StoreQueries.GetUserIDByEmployeeID, user_Employee_ID);
+
             }
         catch(error: any) {
             throw(error as systemError);

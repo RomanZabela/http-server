@@ -30,6 +30,7 @@ class UserController {
       if (numericParamOrError > 0) {
         try {
         const body: user = req.body;
+        
         await UserService.updateById({
           ID: numericParamOrError,
           user_Employee_ID: body.user_Employee_ID,
@@ -63,7 +64,7 @@ class UserController {
           User_Password: body.User_Password
       }, (req as AuthenticationRequest).userData.userId);
 
-      return res.status(200).json(result.User_Login);
+      return res.status(200).json(result.ID);
     }
     
     catch(error: any) {

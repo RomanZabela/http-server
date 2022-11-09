@@ -156,7 +156,7 @@ export class SQLHelper {
         });
     }
 
-    public static executeQuesryNoResult(query: string, ignoreNoRowsAffected: boolean, ...params: (string | number)[]): Promise<void> {
+    public static executeQuerysNoResult(query: string, ignoreNoRowsAffected: boolean, ...params: (string | number)[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             SQLHelper.openConnection()
                 .then((connection: Connection) => {
