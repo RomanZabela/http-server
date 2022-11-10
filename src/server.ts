@@ -2,10 +2,6 @@
 import http from 'http';
 import express, { Express } from 'express';
 import morgan from 'morgan';
-import routes from './routes/posts';
-import storeroutes from './routes/store.route';
-import authentication from './routes/authentication.route';
-import userRoutes from './routes/user.routes';
 
 const router: Express = express();
 

@@ -5,8 +5,6 @@ export interface Stores extends entityWithID {
     storeName: string;
     storeAdress: string;
     storeCapacity: number;
-    storeActive: number;
-    storeUpdateDate: string;
 }
 
 export interface systemError {
@@ -39,4 +37,10 @@ export interface user extends entityWithID {
     user_Employee_ID: number;
     User_Login?: string;
     User_Password?: string;
+}
+
+export interface administrativeInformation {
+    Update_Date: string;
+    Field_Type: number;
+    User_ID: number;
 }

@@ -8,8 +8,9 @@ import { ResponseHelper } from "../../framework/response.helper";
 import StoreService from "../store/store.service";
 
 class StoreController {
-  constructor() {}
 
+  constructor() {}
+  
     async getStores(req: any, res: Response, next: NextFunction) {
 
         StoreService.getStores()
@@ -23,25 +24,20 @@ class StoreController {
         });
     }
 
-    async getStoreByID(req: Request, res: Response, next: NextFunction) {
+    async getStore(req: any, res: Response, next: NextFunction) {
         const numericParamOrError: number | systemError = RequestHelper.ParseNumericInput(req.params.id);
+    
         if (typeof numericParamOrError === "number") {
-            if (numericParamOrError > 0) {
-                StoreService.getStore(numericParamOrError)
-                .then((result: Stores) => {
-                    return res.status(200).json(result);
-                })
-                .catch((error: systemError) => {
-                    return ResponseHelper.handleError(res, error);
-            });
-            }
-            else {
-
-            }
+          if (numericParamOrError > 0) {
+            const result: Stores = await StoreService.getStoreById(numericParamOrError);
+            return res.status(200).json(result);
+          } else {
+    
+          }
         } else {
-            return ResponseHelper.handleError(res, numericParamOrError);
+          return ResponseHelper.handleError(res, numericParamOrError);
         }
-    }
+      }
 
     async updateStoreByID(req: Request, res: Response, next: NextFunction) {
 
@@ -51,15 +47,11 @@ class StoreController {
             if (numericParamOrError > 0) {
                 const body: Stores = req.body;
 
-                const createDate: Date = new Date();
-
                 StoreService.updateStore({
                     ID: numericParamOrError,
                     storeCapacity: body.storeCapacity,
                     storeName: body.storeName,
-                    storeAdress: body.storeAdress,
-                    storeActive: Status.Active,
-                    storeUpdateDate: DateHelper.dateToString(createDate)
+                    storeAdress: body.storeAdress
                 }, (req as AuthenticationRequest).userData.userId)
                 .then((result: Stores) => {
                     return res.status(200).json(result);
@@ -78,18 +70,27 @@ class StoreController {
     async addStore(req: Request, res: Response, next: NextFunction) {
         const body: Stores = req.body;
 
-        const createDate: Date = new Date();
-
         StoreService.addStore({
             ID: NON_EXISTING_ID,
             storeCapacity: body.storeCapacity,
             storeName: body.storeName,
-            storeAdress: body.storeAdress,
-            storeUpdateDate: DateHelper.dateToString(createDate),
-            storeActive: Status.Active,
+            storeAdress: body.storeAdress
         }, (req as AuthenticationRequest).userData.userId)
         .then((result: Stores) => {
-            return res.status(200).json(result.storeName);
+            return res.status(200).json(result.ID);
+        })
+        .catch((error: systemError) => {
+            return ResponseHelper.handleError(res, error);
+        });
+
+    }
+
+    async deleteStoreByID(req: Request, res: Response, next: NextFunction) {
+        const body: Stores = req.body;
+
+        StoreService.deleteByID(body.ID, (req as AuthenticationRequest).userData.userId)
+        .then((result: number) => {
+            return res.status(200).json(result);
         })
         .catch((error: systemError) => {
             return ResponseHelper.handleError(res, error);

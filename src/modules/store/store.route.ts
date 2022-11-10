@@ -12,8 +12,10 @@ export class StoreRoute extends RouteConfig {
 
   public configureRoutes() {
     this.app.route(`/${this.baseUrl}/stores`).get(([AuthMiddleware.verifyToken([Roles.Administrator, Roles.UsualUser])]),[StoreController.getStores]);
-    this.app.route(`/${this.baseUrl}/store/:id`).get(([AuthMiddleware.verifyToken([Roles.Administrator, Roles.UsualUser])]),[StoreController.getStoreByID]);
+    this.app.route(`/${this.baseUrl}/store/:id`).get(([AuthMiddleware.verifyToken([Roles.Administrator, Roles.UsualUser])]),[StoreController.getStore]);
     this.app.route(`/${this.baseUrl}/store`).post(([AuthMiddleware.verifyToken([Roles.Administrator, Roles.UsualUser])]),[StoreController.addStore]);
+    this.app.route(`/${this.baseUrl}/store/:id`).put([AuthMiddleware.verifyToken([Roles.Administrator]), StoreController.updateStoreByID]);
+    this.app.route(`/${this.baseUrl}/stores/delete`).put([AuthMiddleware.verifyToken([Roles.Administrator]), StoreController.deleteStoreByID]);
     return this.app
   }
 

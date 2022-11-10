@@ -3,9 +3,11 @@ import { StoreQueries } from "../../constants";
 import { Stores, systemError, entityWithID } from "../../entities";
 import { Status } from "../../enum";
 import { SQLHelper } from "../../core/sql.helper";
+import DbService from "../../core/db.service";
+import { TableNames } from "../../db-entities";
+import { DateHelper } from "../../framework/date.helper";
 
-interface localStores {
-    ID: number;
+interface localStores extends entityWithID{
     Store_Name: string;
     Store_Address: string;
     Store_Capacity: number;
@@ -15,9 +17,10 @@ interface localStores {
 
 interface IStoreService {
     getStores(): Promise<Stores[]>;
-    getStore(id: number): Promise<Stores>;
+    getStoreById(storeId: number): Promise<Stores>;
     updateStore(Stores: Stores, userId: number): Promise<Stores>;
     addStore(Stores: Stores, userId: number): Promise<Stores>;
+    deleteByID(id: number, userId: number): Promise<number>
 }
 
 class StoreService implements IStoreService { 
@@ -46,16 +49,8 @@ class StoreService implements IStoreService {
 
     //get only one store by ID
 
-    public getStore(id: number): Promise<Stores> {
-        return new Promise<Stores>((resolve, reject) => {
-            SQLHelper.executeQuerySingle<localStores>(StoreQueries.getStoreByID, id, Status.Active)
-            .then((queryResult: localStores) => {
-                resolve(this.parseLocalStore(queryResult));
-            })
-            .catch((error: systemError) => {
-                reject(error);
-            });
-        });
+    public async getStoreById(storeId: number): Promise<Stores> {
+        return await DbService.getFromTableById(TableNames.Store, storeId);
     }
 
     //update store field by name
@@ -63,7 +58,7 @@ class StoreService implements IStoreService {
     public updateStore(storeType: Stores, userId: number): Promise<Stores> {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
-            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreCapacity, storeType.storeCapacity, storeType.storeName, storeType.ID, storeType.storeActive)
+            SQLHelper.executeQueryUpdate(StoreQueries.updateStoreById, storeType.storeCapacity, storeType.storeName, storeType.storeAdress, DateHelper.dateToString(updateDate), userId, storeType.ID, Status.Active)
             .then(() => {
                 resolve(storeType);
             })
@@ -77,7 +72,7 @@ class StoreService implements IStoreService {
         return new Promise<Stores>((resolve, reject) => {
             const updateDate: Date = new Date();
 
-            SQLHelper.createNew(StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Stores.storeActive, updateDate, Status.Active, userId)
+            SQLHelper.createNew(StoreQueries.addNewStore, Stores, Stores.storeName, Stores.storeAdress, Stores.storeCapacity, Status.Active, updateDate, userId)
                 .then((result: entityWithID) => {
                     resolve(result as Stores);
                 }) 
@@ -87,14 +82,25 @@ class StoreService implements IStoreService {
         });
     }
 
+    public deleteByID(id: number, userId: number): Promise<number> {
+        return new Promise<number>((resolve, reject) => {
+            const updateDate: Date = new Date();
+            SQLHelper.executeQueryUpdate(StoreQueries.deleteStore, Status.NotActive, DateHelper.dateToString(updateDate), userId, id, Status.Active)
+            .then(() => {
+                resolve(id);
+            })
+            .catch((error: systemError) => {
+                reject(error);
+            });
+        });
+    }
+
     private parseLocalStore(local: localStores): Stores {
         return {
             ID: local.ID,
             storeName: local.Store_Name,
             storeAdress: local.Store_Address,
-            storeCapacity: local.Store_Capacity,
-            storeActive: local.Store_Field_Type,
-            storeUpdateDate: local.Store_Update_Date,
+            storeCapacity: local.Store_Capacity
         }
     }
 }

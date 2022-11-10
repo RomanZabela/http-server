@@ -13,8 +13,8 @@ interface IUserService {
     getById(userId: number): Promise<user>;
     updateById(user: user, userId: number): Promise<void>;
     addUser(user: user, userId: number): Promise<entityWithID>;
-    getUserIDByEmployeeID(user_Employee_ID: number): Promise<number>
-    //deleteById(id: number, userId: number): Promise<void>;
+    getUserIDByEmployeeID(user_Employee_ID: number): Promise<void>
+    deleteById(id: number, userId: number): Promise<void>;
 }
 
 class UserService implements IUserService {
@@ -48,14 +48,17 @@ class UserService implements IUserService {
                 await this.getUserIDByEmployeeID(user.user_Employee_ID);
             }
             catch(error){
-                const createDate: string = DateHelper.dateToString(new Date);
+                if ((error as systemError).code === 102)
+                {
+                    const createDate: string = DateHelper.dateToString(new Date);
 
-                const hashedPassword = await hash(user.User_Password as string, 10);
+                    const hashedPassword = await hash(user.User_Password as string, 10);
     
-                result = await SQLHelper.createNew(StoreQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId);
+                    result = await SQLHelper.createNew(StoreQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId);
+                }
+
             }
             
-            //result = this.getById
             return result = user;
 
             }
@@ -64,10 +67,10 @@ class UserService implements IUserService {
         };
     };
 
-    public async getUserIDByEmployeeID(user_Employee_ID: number): Promise<number>{
+    public async getUserIDByEmployeeID(user_Employee_ID: number): Promise<void>{
         try {
 
-            return await SQLHelper.executeQuerySingle(StoreQueries.GetUserIDByEmployeeID, user_Employee_ID);
+            await SQLHelper.executeQuerySingle(StoreQueries.GetUserIDByEmployeeID, user_Employee_ID, Status.Active);
 
             }
         catch(error: any) {
@@ -76,19 +79,19 @@ class UserService implements IUserService {
     };
 
 
-//     public deleteById(id: number, userId: number): Promise<void> {
-//         return new Promise<void>((resolve, reject) => {
-//             const updateDate: Date = new Date();
+    public async deleteById(id: number, userId: number): Promise<void> {
+        try {
+            const updateDate: Date = new Date();
 
-//             SQLHelper.executeQueryNoResult(this.errorService, StoreQueries.DeleteUserById, true, DateHelper.dateToString(updateDate), userId, Status.Active, id, Status.Active)
-//                 .then(() => {
-//                     resolve();
-//                 })
-//                 .catch((error: ErrorService) => {
-//                     reject(error);
-//                 });
-//         });
-//    }
+            const user: user = await this.getById(id);
+
+            await SQLHelper.executeQueryNoResult(StoreQueries.DeleteUser, false, Status.NotActive, userId, DateHelper.dateToString(updateDate), 0, id, Status.Active);
+        }                
+        
+        catch(error) {
+            throw(error as systemError);
+            };
+        };
 }
 
 export default new UserService();
