@@ -44,3 +44,8 @@ export interface administrativeInformation {
     Field_Type: number;
     User_ID: number;
 }
+
+export interface Employee extends entityWithID {
+    FirstName: string;
+    LastName: string;
+}

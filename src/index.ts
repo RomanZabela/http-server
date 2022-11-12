@@ -5,6 +5,7 @@ import { RouteConfig } from "./framework/route.config"
 import { UserRoutes } from "./modules/users/user.route"
 import { StoreRoute } from "./modules/store/store.route"
 import { AuthenticationRoutes } from "./core/authentication/auth.route"
+import { EmployeeRoutes } from "./modules/employees/employee.route"
 
 const routes: Array<RouteConfig> = []
 const app: Express = express()
@@ -24,6 +25,7 @@ if (process.env.DEBUG) {
 routes.push(new AuthenticationRoutes(app));
 routes.push(new UserRoutes(app));
 routes.push(new StoreRoute(app));
+routes.push(new EmployeeRoutes(app));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome world")

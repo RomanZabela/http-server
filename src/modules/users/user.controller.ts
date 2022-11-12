@@ -13,7 +13,7 @@ class UserController {
 
     if (typeof numericParamOrError === "number") {
       if (numericParamOrError > 0) {
-        const result: user = await UserService.getById(numericParamOrError);
+        const result: user = await UserService.getUserById(numericParamOrError);
         return res.status(200).json(result);
       } else {
 
@@ -38,7 +38,7 @@ class UserController {
             User_Password: body.User_Password
           }, (req as AuthenticationRequest).userData.userId)
 
-          const result: user = await UserService.getById(numericParamOrError);
+          const result: user = await UserService.getUserById(numericParamOrError);
 
           return res.status(200).json(result);
         }

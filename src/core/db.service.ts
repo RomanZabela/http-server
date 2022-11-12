@@ -1,7 +1,7 @@
 import { columnDefinition, ColumnType, tableDefinition, TableNames } from "../db-entities";
 import { DbTable } from "./db-table.service";
 import * as _ from "underscore";
-import { Stores, user } from "../entities";
+import { Employee, Stores, user } from "../entities";
 
 interface localTable<T> {
     table: tableDefinition;
@@ -58,6 +58,26 @@ class DbService implements IDbService {
         },{
             dbName: "Store_Capacity",
             name: "storeCapacity",
+            type: ColumnType.Integer,
+            isForOutput: true,
+            isQueriable: true
+        }]);
+
+        this._tables[TableNames.Employee] = this.addTableToContext<Employee>(TableNames.Employee, [{
+            dbName: "ID",
+            name: "ID",
+            type: ColumnType.Integer,
+            isForOutput: true,
+            isQueriable: true
+        }, {
+            dbName: "Employee_LastName",
+            name: "employeeLastName",
+            type: ColumnType.Varchar,
+            isForOutput: true,
+            isQueriable: true
+        },{
+            dbName: "Employee_FirstName",
+            name: "employeeFirstName",
             type: ColumnType.Integer,
             isForOutput: true,
             isQueriable: true

@@ -2,26 +2,24 @@ import { TableNames } from "../../db-entities";
 import { entityWithID, systemError, user } from "../../entities";
 import DbService from "../../core/db.service";
 import { SQLHelper } from "../../core/sql.helper";
-import { StoreQueries } from "../../constants";
+import { UserQueries } from "../../constants";
 import { Status } from "../../enum";
 import { DateHelper } from "../../framework/date.helper";
 import { hash } from "bcryptjs";
-import errorService from "../../core/error.service";
-
 
 interface IUserService {
-    getById(userId: number): Promise<user>;
+    getUserById(userId: number): Promise<user>;
     updateById(user: user, userId: number): Promise<void>;
     addUser(user: user, userId: number): Promise<entityWithID>;
-    getUserIDByEmployeeID(user_Employee_ID: number): Promise<void>
     deleteById(id: number, userId: number): Promise<void>;
+    getUserIDByEmployeeID(user_Employee_ID: number): Promise<entityWithID>
 }
 
 class UserService implements IUserService {
 
     constructor() { }
 
-    public async getById(userId: number): Promise<user> {
+    public async getUserById(userId: number): Promise<user> {
         return await DbService.getFromTableById(TableNames.User, userId);
     }
 
@@ -32,7 +30,7 @@ class UserService implements IUserService {
 
             const hashedPassword = await hash(user.User_Password as string, 10);
 
-            await SQLHelper.executeQueryUpdate(StoreQueries.UpdateUserById, user.User_Login as string, hashedPassword, userId, DateHelper.dateToString(createDate), user.ID, Status.Active);
+            await SQLHelper.executeQueryUpdate(UserQueries.UpdateUserById, user.User_Login as string, hashedPassword, userId, DateHelper.dateToString(createDate), user.ID, Status.Active);
         }
         catch(error: any) {
             throw (error as systemError);
@@ -54,7 +52,7 @@ class UserService implements IUserService {
 
                     const hashedPassword = await hash(user.User_Password as string, 10);
     
-                    result = await SQLHelper.createNew(StoreQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId);
+                    result = await SQLHelper.createNew(UserQueries.AddUser, user, user.user_Employee_ID, user.User_Login as string, hashedPassword, Status.Active, createDate, userId);
                 }
 
             }
@@ -67,10 +65,10 @@ class UserService implements IUserService {
         };
     };
 
-    public async getUserIDByEmployeeID(user_Employee_ID: number): Promise<void>{
+    public async getUserIDByEmployeeID(user_Employee_ID: number): Promise<entityWithID>{
         try {
 
-            await SQLHelper.executeQuerySingle(StoreQueries.GetUserIDByEmployeeID, user_Employee_ID, Status.Active);
+            return await SQLHelper.executeQuerySingle(UserQueries.GetUserIDByEmployeeID, user_Employee_ID, Status.Active);
 
             }
         catch(error: any) {
@@ -83,9 +81,7 @@ class UserService implements IUserService {
         try {
             const updateDate: Date = new Date();
 
-            const user: user = await this.getById(id);
-
-            await SQLHelper.executeQueryNoResult(StoreQueries.DeleteUser, false, Status.NotActive, userId, DateHelper.dateToString(updateDate), 0, id, Status.Active);
+            await SQLHelper.executeQueryNoResult(UserQueries.DeleteUser, false, Status.NotActive, userId, DateHelper.dateToString(updateDate), 0, id, Status.Active);
         }                
         
         catch(error) {

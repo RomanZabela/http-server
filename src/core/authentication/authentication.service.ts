@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { StoreQueries } from "../../constants";
+import { UserQueries } from "../../constants";
 import { entityWithID, jwsUserData, systemError } from "../../entities";
 import { AppError, Roles, Status } from "../../enum";
 import { SQLHelper } from "../sql.helper";
@@ -20,7 +20,7 @@ class AuthenticationService implements IAuthenticationService {
 
     public async login(username: string, password: string): Promise<jwsUserData> {
         try {
-            const user: localUser = await SQLHelper.executeQuerySingle<localUser>(StoreQueries.GetUserByLogin, username, Status.Active)
+            const user: localUser = await SQLHelper.executeQuerySingle<localUser>(UserQueries.GetUserByLogin, username, Status.Active)
             if (bcrypt.compareSync(password, user.User_password)) {
                 const result: jwsUserData = {
                     userId: user.ID,
